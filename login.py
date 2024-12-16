@@ -17,8 +17,8 @@ def login():
 
     while attempts < 3:  # Memberikan 3 kali kesempatan login
         print("\n=== Login ===")
-        email = input("Masukkan Email: ").strip()
-        password = input("Masukkan Password: ").strip()
+        email = input("Masukkan Email: ")
+        password = input("Masukkan Password: ")
 
         cursor.execute("SELECT user_role FROM users WHERE email = %s AND password = %s", (email, password))
         result = cursor.fetchone()
@@ -42,6 +42,3 @@ def login():
 
     cursor.close()
     conn.close()
-
-# Menjalankan fungsi login
-login()
