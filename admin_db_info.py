@@ -5,5 +5,3 @@ def get_current_mysql_password():
         current_password = content[2].split("=", 1)[1].strip().strip('"')
         
     return current_password if current_password.strip() else ""
-
-print(len(get_current_mysql_password()))
