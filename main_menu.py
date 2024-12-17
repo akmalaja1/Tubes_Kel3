@@ -2,12 +2,13 @@ import mysql.connector
 from main_features import add_mata_kuliah, view_dosen, view_kelas, ajukan_kelas, input_jadwal_dosen, buat_kelas, edit_jadwal_dosen, view_jadwal_dosen, tampilkan_kelas
 from register import register_user
 from login import login
+from admin_db_info import get_current_mysql_password
 
 # Koneksi ke database MySQL
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="root123",
+    password=get_current_mysql_password(),
     database="ebookingclass"
 )
 cursor = conn.cursor()
