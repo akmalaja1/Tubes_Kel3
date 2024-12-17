@@ -1,25 +1,117 @@
 import mysql.connector
+from admin_db_info import get_current_mysql_password
 
 # Koneksi ke database
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="root123",
+    password=get_current_mysql_password(),
     database="ebookingclass"
 )
+
+def add_ruang_kelas():
+    cursor = conn.cursor()
+    print("\n=== Tambah Ruang Kelas ===")
+    print("Tekan Enter pada kolom 'Kode Kelas' jika ingin berhenti.\n")
+    
+    try:
+        while True:
+            # Input kode kelas dan informasi ruang kelas
+            kode_kelas = input("Masukkan Kode Kelas: ").strip()
+            if not kode_kelas:  # Hentikan jika input kosong
+                print("Proses penambahan ruang kelas selesai.\n")
+                break
+            
+            informasi_kelas = input("Masukkan Informasi Kelas: ").strip()
+            
+            # Menambahkan data ke tabel kelas
+            query = "INSERT INTO kelas (kode_kelas, informasi_kelas) VALUES (%s, %s)"
+            cursor.execute(query, (kode_kelas, informasi_kelas))
+            conn.commit()
+            print(f"Ruang kelas '{kode_kelas}' berhasil ditambahkan!\n")
+    
+    except mysql.connector.Error as err:
+        print(f"Terjadi kesalahan: {err}")
+    finally:
+        cursor.close()
 
 # Fungsi tambahan untuk admin
 def add_mata_kuliah():
     cursor = conn.cursor()
-    kode_matkul = input("Masukkan Kode Mata Kuliah: ").strip()
-    nama_matkul = input("Masukkan Nama Mata Kuliah: ").strip()
-
+    print("\n=== Tambah Mata Kuliah ===")
+    
     try:
-        cursor.execute("INSERT INTO mata_kuliah (kode_matkul, nama_matkul) VALUES (%s, %s)", (kode_matkul, nama_matkul))
-        conn.commit()
-        print("Mata kuliah berhasil ditambahkan!")
+        while True:
+            kode_matkul = input("Masukkan Kode Mata Kuliah (tekan Enter untuk berhenti): ").strip()
+            if not kode_matkul:  # Jika input kosong, berhenti
+                break
+            
+            nama_matkul = input("Masukkan Nama Mata Kuliah: ").strip()
+            if not nama_matkul:  # Validasi nama mata kuliah kosong
+                print("Nama mata kuliah tidak boleh kosong. Silakan ulangi.")
+                continue
+            
+            # Insert data ke database
+            cursor.execute("INSERT INTO mata_kuliah (kode_matkul, nama_matkul) VALUES (%s, %s)", (kode_matkul, nama_matkul))
+            conn.commit()
+            print(f"Mata kuliah {nama_matkul} berhasil ditambahkan!\n")
+        
+        print("Proses penambahan mata kuliah selesai.")
+
     except mysql.connector.Error as err:
-        print(f"Error: {err}")
+        print(f"Terjadi kesalahan: {err}")
+    finally:
+        cursor.close()
+
+def view_mata_kuliah():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT kode_matkul, nama_matkul FROM mata_kuliah")
+        matkul = cursor.fetchall()
+        if matkul:
+            print("\n=== Data Mata Kuliah ===")
+            for mk in matkul:
+                print("-" * 30)
+                print(f"Kode Mata Kuliah: {mk[0]}")
+                print(f"Nama Mata Kuliah: {mk[1]}")
+                print("-" * 30)
+        else:
+            print("Tidak ada data mata kuliah.")
+    except mysql.connector.Error as err:
+        print(f"Terjadi kesalahan: {err}")
+    finally:
+        cursor.close()
+
+def add_dosen():
+    cursor = conn.cursor()
+    print("\n=== Tambah Data Dosen ===")
+    print("Tekan Enter pada 'NIP' jika ingin berhenti.\n")
+    
+    try:
+        while True:
+            # Input NIP Dosen
+            nip = input("Masukkan NIP Dosen: ").strip()
+            if not nip:  # Hentikan jika input kosong
+                print("Proses penambahan data dosen selesai.\n")
+                break
+
+            # Input data lainnya
+            nama = input("Masukkan Nama Dosen: ").strip()
+            alamat = input("Masukkan Alamat Dosen: ").strip()
+            email = input("Masukkan Email Dosen: ").strip()
+            no_telp = input("Masukkan No. Telepon Dosen: ").strip()
+
+            # Query untuk menambahkan data ke tabel dosen
+            query = """
+            INSERT INTO dosen (nip, nama, alamat, email, no_tlp)
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(query, (nip, nama, alamat, email, no_telp))
+            conn.commit()
+            print(f"Data dosen dengan NIP '{nip}' berhasil ditambahkan!\n")
+
+    except mysql.connector.Error as err:
+        print(f"Terjadi kesalahan: {err}")
     finally:
         cursor.close()
 
