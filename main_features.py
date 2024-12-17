@@ -187,7 +187,7 @@ def buat_kelas():
         jam_mulai = input("Masukkan Jam Mulai (HH:MM, contoh: 08:00): ").strip()
         jam_selesai = input("Masukkan Jam Selesai (HH:MM, contoh: 10:00): ").strip()
 
-        waktu_penggunaan = f"{hari} {jam_mulai} - {jam_selesai}"
+        # waktu_penggunaan = f"{hari} {jam_mulai} - {jam_selesai}"
 
         # Memilih ruang kelas
         print("\nPilih Ruang Kelas:")
@@ -205,8 +205,8 @@ def buat_kelas():
 
         # Simpan data kelas ke database
         informasi_kelas = f"Kelas untuk mata kuliah {kode_matkul} dengan dosen NIP {nip} pada hari {hari}, jam {jam_mulai} - {jam_selesai} di ruang {kode_kelas}."
-        query = "INSERT INTO detail_kelas (kode_kelas, kode_matkul, waktu_penggunaan, nip_dosen, informasi_kelas, status) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(query, (kode_kelas, kode_matkul, waktu_penggunaan, nip, informasi_kelas, 'Tersedia'))
+        query = "INSERT INTO detail_kelas (kode_kelas, kode_matkul, nip_dosen, informasi_kelas, status) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(query, (kode_kelas, kode_matkul, nip, informasi_kelas, 'Tersedia'))
         conn.commit()
         print("Kelas berhasil dibuat.")
 
