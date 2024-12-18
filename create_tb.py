@@ -19,7 +19,7 @@ def create_table():
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL,
-            password VARCHAR(20) NOT NULL,
+            password VARCHAR(60) NOT NULL,
             user_role ENUM('admin','mahasiswa') NOT NULL
         )''')
     
