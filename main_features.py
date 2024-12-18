@@ -162,32 +162,77 @@ def input_jadwal_dosen():
 def view_jadwal_dosen():
     cursor = conn.cursor()
     try:
-        # Query dengan INNER JOIN untuk menggabungkan tabel jadwal_dosen dan dosen
-        query = """
-        SELECT jadwal_dosen.nip, dosen.nama, jadwal_dosen.hari, jadwal_dosen.jam_mulai, jadwal_dosen.jam_selesai
-        FROM jadwal_dosen
-        INNER JOIN dosen ON jadwal_dosen.nip = dosen.nip
-        """
-        cursor.execute(query)
-        jadwal = cursor.fetchall()
+        while True:
+            print("\n=== Lihat Jadwal Kosong Dosen ===")
+            print("1. Lihat semua jadwal dosen")
+            print("2. Lihat jadwal berdasarkan NIP")
+            print("3. Kembali ke menu utama")
+            choice = input("Pilih menu: ").strip()
 
-        if jadwal:
-            print("\n=== Jadwal Kosong Seluruh Dosen ===")
-            for j in jadwal:
-                print(f"""
-                NIP Dosen   : {j[0]}
-                Nama Dosen  : {j[1]}
-                Hari        : {j[2]}
-                Jam Mulai   : {j[3]}
-                Jam Selesai : {j[4]}
-                """)
-        else:
-            print("Tidak ada jadwal kosong dosen.")
+            if choice == "1":  # Lihat semua jadwal dosen
+                query = """
+                SELECT jadwal_dosen.nip, dosen.nama, jadwal_dosen.hari, jadwal_dosen.jam_mulai, jadwal_dosen.jam_selesai
+                FROM jadwal_dosen
+                INNER JOIN dosen ON jadwal_dosen.nip = dosen.nip
+                """
+                cursor.execute(query)
+                jadwal = cursor.fetchall()
+
+                if jadwal:
+                    print("\n=== Jadwal Kosong Seluruh Dosen ===")
+                    for j in jadwal:
+                        print(f"""
+                        =====================
+                        NIP Dosen   : {j[0]}
+                        Nama Dosen  : {j[1]}
+                        Hari        : {j[2]}
+                        Jam Mulai   : {j[3]}
+                        Jam Selesai : {j[4]}
+                        =====================
+                        """)
+                else:
+                    print("Tidak ada jadwal kosong dosen.")
+
+            elif choice == "2":  # Lihat jadwal berdasarkan NIP
+                nip = input("Masukkan NIP dosen: ").strip()
+                query_dosen = "SELECT nama FROM dosen WHERE nip = %s"
+                cursor.execute(query_dosen, (nip,))
+                result_dosen = cursor.fetchone()
+
+                if result_dosen:  # Jika dosen ditemukan
+                    nama_dosen = result_dosen[0]
+                    query_jadwal = """
+                    SELECT jadwal_dosen.hari, jadwal_dosen.jam_mulai, jadwal_dosen.jam_selesai
+                    FROM jadwal_dosen
+                    WHERE nip = %s
+                    """
+                    cursor.execute(query_jadwal, (nip,))
+                    jadwal_dosen = cursor.fetchall()
+
+                    if jadwal_dosen:
+                        print(f"\n=== Jadwal Kosong untuk Dosen NIP {nip} ({nama_dosen}) ===")
+                        for j in jadwal_dosen:
+                            print(f"""
+                            Hari        : {j[0]}
+                            Jam Mulai   : {j[1]}
+                            Jam Selesai : {j[2]}
+                            """)
+                    else:
+                        print(f"Tidak ada jadwal kosong untuk dosen dengan NIP {nip} ({nama_dosen}).")
+                else:
+                    print(f"Dosen dengan NIP {nip} tidak ditemukan.")
+
+            elif choice == "3":  # Kembali ke menu utama
+                print("Kembali ke menu utama.")
+                break
+
+            else:
+                print("Pilihan tidak valid! Silakan pilih 1, 2, atau 3.")
+
     except Exception as e:
         print(f"Terjadi kesalahan: {e}")
     finally:
         cursor.close()
-
 
 def edit_jadwal_dosen():
     cursor = conn.cursor()
@@ -263,6 +308,7 @@ def buat_kelas():
             print("-"*40)
 
         # Memilih mata kuliah
+        view_mata_kuliah()
         kode_matkul = input("\nMasukkan Kode Mata Kuliah: ").strip()
         kategori_sks = input("Masukkan kategori SKS (4, 3, 2): ").strip()
 
@@ -293,12 +339,14 @@ def buat_kelas():
         for ruang in ruang_kelas:
             print(f"Kode Kelas: {ruang[0]}, Informasi: {ruang[1]}")
 
-        kode_kelas = input("Pilih Kode Kelas untuk kelas: ").strip()
+        kode_kelas = input("\nPilih Kode Kelas untuk kelas: ").strip()
+
+        pengguna = input("\nMasukkan nama pengguna kelas(Contoh: RPL 1-C): ").strip()
 
         # Simpan data kelas ke database
         informasi_kelas = f"Kelas untuk mata kuliah {kode_matkul} dengan dosen NIP {nip} pada hari {hari}, jam {jam_mulai} - {jam_selesai} di ruang {kode_kelas}."
-        query = "INSERT INTO detail_kelas (kode_kelas, kode_matkul, nip_dosen, informasi_kelas, status) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(query, (kode_kelas, kode_matkul, nip, informasi_kelas, 'Tersedia'))
+        query = "INSERT INTO detail_kelas (kode_kelas, kode_matkul, nip_dosen, informasi_kelas, pengguna, status) VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(query, (kode_kelas, kode_matkul, nip, informasi_kelas, pengguna, 'Digunakan'))
         conn.commit()
         print("Kelas berhasil dibuat.")
 
@@ -327,7 +375,7 @@ def tampilkan_kelas():
         cursor = conn.cursor()
         query = '''
         SELECT detail_kelas.kode_kelas, detail_kelas.kode_matkul, detail_kelas.nip_dosen, dosen.nama, detail_kelas.informasi_kelas,
-        detail_kelas.status FROM detail_kelas INNER JOIN dosen ON detail_kelas.nip_dosen = dosen.nip
+        detail_kelas.status, detail_kelas.pengguna FROM detail_kelas INNER JOIN dosen ON detail_kelas.nip_dosen = dosen.nip
         ORDER BY kode_kelas ASC
         '''
         cursor.execute(query)
@@ -342,7 +390,7 @@ def tampilkan_kelas():
                 print(f"NIP Dosen            : {row[2]}")
                 print(f"Dosen yang mengajar  : {row[3]}")
                 print(f"Informasi Kelas      : {row[4]}")
-                print(f"Status               : {row[5]}")
+                print(f"Status               : {row[5]} oleh {row[6]}")
                 print("-" * 40)
         else:
             print("Tidak ada data di tabel detail_kelas.")
