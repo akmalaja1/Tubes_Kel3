@@ -1,6 +1,8 @@
 import mysql.connector
 import time
 from admin_db_info import get_current_mysql_password
+import bcrypt
+import unicodedata
 
 # Koneksi ke database MySQL
 conn = mysql.connector.connect(
@@ -18,28 +20,49 @@ def login():
 
     while attempts < 3:  # Memberikan 3 kali kesempatan login
         print("\n=== Login ===")
-        email = input("Masukkan Email: ")
+        email = input("Masukkan Email: ").lower()
         password = input("Masukkan Password: ")
+        password = unicodedata.normalize("NFKC", password).strip()
 
-        cursor.execute("SELECT user_role FROM users WHERE email = %s AND password = %s", (email, password))
-        result = cursor.fetchone()
+        # Check Email
+        cursor.execute(f"SELECT password FROM users WHERE email = \"{email}\"")
+        password_result = cursor.fetchone()
 
-        if result:
-            role = result[0]
-            print(f"Login berhasil sebagai {role}!")
-            if role == 'admin':
-                admin_menu()
-            elif role == 'mahasiswa':
-                mahasiswa_menu()
-            break  # Keluar dari loop karena login berhasil
-        else:
+        # Jika email tidak valid, maka password tidak ada
+        if (password_result == None):
             print("Login gagal! Email atau password salah.")
-            attempts += 1  # Increment percobaan login
+            attempts += 1
             if attempts < 3:
                 print(f"Sisa percobaan login: {3 - attempts}")
             else:
                 print("Terlalu banyak percobaan gagal. Program akan pending selama 30 detik.")
                 time.sleep(30)  # Menunggu selama 30 detik setelah 3 kali gagal
+        
+        # Jika email valid, password ada
+        else:
+            hashed_password = password_result[0]
+            
+            # login berhasil jika password = hashed password
+            if bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8")):
+                cursor.execute(f"SELECT user_role FROM users WHERE email = \"{email}\"")
+                role = cursor.fetchone()
+                print(f"current role: {role[0]}")
+                print(f"Login berhasil sebagai {role[0]}!")
+                if role[0] == 'admin':
+                    admin_menu()
+                elif role[0] == 'mahasiswa':
+                    mahasiswa_menu()
+                break  # Keluar dari loop karena login berhasil
+            
+            # gagal jika password =/= hashed password
+            else:
+                print("Login gagal! Email atau password salah.")
+                attempts += 1  # Increment percobaan login
+                if attempts < 3:
+                    print(f"Sisa percobaan login: {3 - attempts}")
+                else:
+                    print("Terlalu banyak percobaan gagal. Program akan pending selama 30 detik.")
+                    time.sleep(30)  # Menunggu selama 30 detik setelah 3 kali gagal
 
     cursor.close()
     conn.close()
