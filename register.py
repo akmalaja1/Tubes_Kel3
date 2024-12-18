@@ -20,7 +20,6 @@ def register_user():
     email = input("Masukkan Email: ").strip().lower()
     password = input("Masukkan Password: ").strip()
     password_hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    print(type(password_hashed))
     role = "mahasiswa"
 
     # if role not in ['admin', 'mahasiswa']:
@@ -31,7 +30,7 @@ def register_user():
         cursor.execute('''
         INSERT INTO users (username, email, password, user_role)
         VALUES (%s, %s, %s, %s)
-        ''', (username, email, password_hashed, role))
+        ''', (username, email, password_hashed.decode('utf-8'), role))
         conn.commit()
         print("Registrasi berhasil!")
     except mysql.connector.IntegrityError:
