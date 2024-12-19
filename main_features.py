@@ -266,9 +266,9 @@ def edit_jadwal_dosen():
 
         # Mengedit data jadwal
         print("Masukkan data baru untuk jadwal ini.")
-        hari_baru = input(f"Masukkan hari baru (sebelumnya {jadwal_edit[0]}): ").strip()
-        jam_mulai_baru = input(f"Masukkan jam mulai baru (sebelumnya {jadwal_edit[1]}): ").strip()
-        jam_selesai_baru = input(f"Masukkan jam selesai baru (sebelumnya {jadwal_edit[2]}): ").strip()
+        hari_baru = input(f"Masukkan hari baru (sebelumnya {jadwal_edit[1]}): ").strip()
+        jam_mulai_baru = input(f"Masukkan jam mulai baru (sebelumnya {jadwal_edit[2]}): ").strip()
+        jam_selesai_baru = input(f"Masukkan jam selesai baru (sebelumnya {jadwal_edit[3]}): ").strip()
 
         # Update jadwal dosen
         update_query = '''UPDATE jadwal_dosen

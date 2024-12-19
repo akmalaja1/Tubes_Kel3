@@ -20,7 +20,7 @@ def register_user():
     email = input("Masukkan Email: ").strip().lower()
     password = input("Masukkan Password: ").strip()
     password_hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    print(type(password_hashed))
+    # print(type(password_hashed))
     role = "mahasiswa"
 
     # if role not in ['admin', 'mahasiswa']:
