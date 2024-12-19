@@ -1,5 +1,6 @@
 import mysql.connector
-from main_features import add_mata_kuliah, view_dosen, view_kelas, ajukan_kelas, input_jadwal_dosen, buat_kelas, edit_jadwal_dosen, view_jadwal_dosen, tampilkan_kelas, add_ruang_kelas, add_dosen, view_mata_kuliah
+from main_features_admin import add_mata_kuliah, view_dosen, view_datakelas, input_jadwal_dosen, buat_kelas, edit_jadwal_dosen, view_jadwal_dosen, tampilkan_kelas, add_ruang_kelas, add_dosen, view_mata_kuliah,edit_kelas
+from main_features_mhs import ajukan_kelas
 from register import register_user
 from login import login
 from admin_db_info import get_current_mysql_password
@@ -27,8 +28,9 @@ def admin_menu():
         print("8. Tambah Ruang Kelas")
         print("9. Lihat Data Ruang Kelas")
         print("10. Buat Kelas Baru")
-        print("11. Lihat Kelas yang Telah Dibuat")
-        print("12. Logout")
+        print("11. Edit Kelas")
+        print("12. Lihat Kelas yang Telah Dibuat")
+        print("13. Logout")
         
         choice = input("Pilih menu: ").strip()
 
@@ -49,12 +51,14 @@ def admin_menu():
         elif choice == '8':
             add_ruang_kelas()
         elif choice == '9':
-            view_kelas()
+            view_datakelas()
         elif choice == '10':
             buat_kelas()
         elif choice == '11':
-            tampilkan_kelas()
+            edit_kelas()
         elif choice == '12':
+            tampilkan_kelas()
+        elif choice == '13':
             print("Logout berhasil! Sampai jumpa lagi.")
             break
         else:
@@ -73,7 +77,7 @@ def mahasiswa_menu():
         choice = input("Pilih menu: ").strip()
 
         if choice == '1':
-            view_kelas()
+            tampilkan_kelas()
         elif choice == '2':
             ajukan_kelas()
         # elif choice == '3':

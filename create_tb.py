@@ -23,16 +23,6 @@ def create_table():
             user_role ENUM('admin','mahasiswa') NOT NULL
         )''')
     
-        # Tabel mahasiswa
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS mahasiswa (
-            nim INT(7) NOT NULL PRIMARY KEY,
-            nama VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            alamat TEXT NOT NULL,
-            no_tlp VARCHAR(20) NOT NULL
-        )''')
-    
         # Tabel dosen
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS dosen (
@@ -87,11 +77,15 @@ def create_table():
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS pengajuan (
             id_pengajuan INT AUTO_INCREMENT PRIMARY KEY,
-            nim INT(7) NOT NULL,
+            username VARCHAR(225) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            id_detail_kelas INT(11), NOT NULL,
             kode_kelas VARCHAR(30) NOT NULL,
             tanggal_pengajuan DATETIME NOT NULL,
             status_pengajuan ENUM('Berhasil','Gagal') NOT NULL,
-            FOREIGN KEY (nim) REFERENCES mahasiswa(nim),
+            FOREIGN KEY (username) REFERENCES users(username),
+            FOREIGN KEY (email) REFERENCES users(email),
+            FOREIGN KEY (id_detail_kelas) REFERENCES detail_kelas(id_detail_kelas),
             FOREIGN KEY (kode_kelas) REFERENCES kelas(kode_kelas)
         )''')
     

@@ -345,37 +345,79 @@ def buat_kelas():
 
         # Simpan data kelas ke database
         informasi_kelas = f"Kelas untuk mata kuliah {kode_matkul} dengan dosen NIP {nip} pada hari {hari}, jam {jam_mulai} - {jam_selesai} di ruang {kode_kelas}."
-        query = "INSERT INTO detail_kelas (kode_kelas, kode_matkul, nip_dosen, informasi_kelas, pengguna, status) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(query, (kode_kelas, kode_matkul, nip, informasi_kelas, pengguna, 'Digunakan'))
+        query = "INSERT INTO detail_kelas (kode_kelas, kode_matkul, nip_dosen, jam_mulai, jam_selesai, informasi_kelas, pengguna, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(query, (kode_kelas, kode_matkul, nip, jam_mulai, jam_selesai, informasi_kelas, pengguna, 'Digunakan'))
         conn.commit()
         print("Kelas berhasil dibuat.")
 
     except Exception as e:
         print(f"Terjadi kesalahan: {e}")
 
-# Fungsi tambahan untuk mahasiswa
-def view_kelas():
+def edit_kelas():
     cursor = conn.cursor()
+    print("\n=== Edit Data Kelas ===")
+
     try:
-        cursor.execute("SELECT * FROM kelas")
-        kelas = cursor.fetchall()
-        if kelas:
-            print("\n=== Data Ruang Kelas ===")
-            for k in kelas:
-                print(f"Kode: {k[0]}, Informasi: {k[1]}")
-        else:
-            print("Tidak ada data kelas.")
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-    finally:
-        cursor.close()
+        # Menampilkan daftar kelas
+        query = "SELECT id_detail_kelas, kode_kelas, kode_matkul, nip_dosen, jam_mulai, jam_selesai, pengguna, status FROM detail_kelas"
+        cursor.execute(query)
+        kelas_list = cursor.fetchall()
+
+        if not kelas_list:
+            print("Tidak ada data kelas yang tersedia!")
+            return
+
+        print("\nDaftar Kelas:")
+        for kelas in kelas_list:
+            print("-" * 40)
+            print(f"ID: {kelas[0]}\nKode Kelas: {kelas[1]}\nKode Mata Kuliah: {kelas[2]}\nNIP Dosen: {kelas[3]}\nJam: {kelas[4]} - {kelas[5]}\nPengguna: {kelas[6]}\nStatus: {kelas[7]}")
+            print("-" * 40)
+
+        # Memilih kelas yang akan diedit
+        kelas_id = input("\nMasukkan ID Kelas yang akan diedit: ").strip()
+
+        # Mengambil data kelas berdasarkan ID
+        query = "SELECT id_detail_kelas, kode_kelas, kode_matkul, nip_dosen, jam_mulai, jam_selesai, pengguna, status FROM detail_kelas WHERE id_detail_kelas = %s"
+        cursor.execute(query, (kelas_id,))
+        kelas = cursor.fetchone()
+
+        if not kelas:
+            print("Kelas dengan ID tersebut tidak ditemukan!")
+            return
+
+        print("\nData Kelas yang Dipilih:")
+        print(f"ID: {kelas[0]}\nKode Kelas: {kelas[1]}\nKode Mata Kuliah: {kelas[2]}\nNIP Dosen: {kelas[3]}\nJam: {kelas[4]} - {kelas[5]}\nPengguna: {kelas[6]}\nStatus: {kelas[7]}")
+
+        # Mengedit data kelas
+        print("\nMasukkan data baru (kosongkan jika tidak ingin mengubah):")
+        kode_kelas_baru = input("Kode Kelas baru: ").strip() or kelas[1]
+        kode_matkul_baru = input("Kode Mata Kuliah baru: ").strip() or kelas[2]
+        nip_dosen_baru = input("NIP Dosen baru: ").strip() or kelas[3]
+        jam_mulai_baru = input("Jam Mulai baru (HH:MM): ").strip() or kelas[4]
+        jam_selesai_baru = input("Jam Selesai baru (HH:MM): ").strip() or kelas[5]
+        pengguna_baru = input("Pengguna baru: ").strip() or kelas[6]
+        status_baru = input("Status baru (kosongkan untuk tetap 'Digunakan'): ").strip() or kelas[7]
+
+        # Update data kelas di database
+        query = """
+            UPDATE detail_kelas
+            SET kode_kelas = %s, kode_matkul = %s, nip_dosen = %s, jam_mulai = %s, jam_selesai = %s, pengguna = %s, status = %s
+            WHERE id_detail_kelas = %s
+        """
+        cursor.execute(query, (kode_kelas_baru, kode_matkul_baru, nip_dosen_baru, jam_mulai_baru, jam_selesai_baru, pengguna_baru, status_baru, kelas_id))
+        conn.commit()
+        print("Data kelas berhasil diperbarui.")
+
+    except Exception as e:
+        print(f"Terjadi kesalahan: {e}")
+
 
 def tampilkan_kelas():
     try:
         cursor = conn.cursor()
         query = '''
-        SELECT detail_kelas.kode_kelas, detail_kelas.kode_matkul, detail_kelas.nip_dosen, dosen.nama, detail_kelas.informasi_kelas,
-        detail_kelas.status, detail_kelas.pengguna FROM detail_kelas INNER JOIN dosen ON detail_kelas.nip_dosen = dosen.nip
+        SELECT detail_kelas.kode_kelas, detail_kelas.kode_matkul, detail_kelas.nip_dosen, dosen.nama, detail_kelas.jam_mulai, 
+        detail_kelas.jam_selesai, detail_kelas.informasi_kelas, detail_kelas.status, detail_kelas.pengguna FROM detail_kelas INNER JOIN dosen ON detail_kelas.nip_dosen = dosen.nip
         ORDER BY kode_kelas ASC
         '''
         cursor.execute(query)
@@ -389,8 +431,10 @@ def tampilkan_kelas():
                 print(f"Kode Mata Kuliah     : {row[1]}")
                 print(f"NIP Dosen            : {row[2]}")
                 print(f"Dosen yang mengajar  : {row[3]}")
-                print(f"Informasi Kelas      : {row[4]}")
-                print(f"Status               : {row[5]} oleh {row[6]}")
+                print(f"Waktu Penggunaan     : {row[4]} - {row[5]}")
+                print(f"Informasi Kelas      : {row[6]}")
+                print(f"Pengguna             : {row[8]}")
+                print(f"Status               : {row[7]} oleh {row[8]}")
                 print("-" * 40)
         else:
             print("Tidak ada data di tabel detail_kelas.")
@@ -401,18 +445,17 @@ def tampilkan_kelas():
     finally:
         cursor.close()
 
-
-def ajukan_kelas():
+def view_datakelas():
     cursor = conn.cursor()
-    kode_kelas = input("Masukkan Kode Kelas yang ingin diajukan: ").strip()
-    nim = input("Masukkan NIM Anda: ").strip()
     try:
-        cursor.execute('''
-        INSERT INTO pengajuan (nim, kode_kelas, tanggal_pengajuan, status_pengajuan)
-        VALUES (%s, %s, NOW(), 'Berhasil')
-        ''', (nim, kode_kelas))
-        conn.commit()
-        print("Pengajuan kelas berhasil!")
+        cursor.execute("SELECT * FROM kelas")
+        kelas = cursor.fetchall()
+        if kelas:
+            print("\n=== Data Ruang Kelas ===")
+            for k in kelas:
+                print(f"Kode: {k[0]}, Informasi: {k[1]}")
+        else:
+            print("Tidak ada data kelas.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
     finally:
