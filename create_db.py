@@ -27,3 +27,5 @@ def create_database():
         print("Database 'ebookingclass' berhasil dibuat.")
     else:
         print("Database 'ebookingclass' sudah ada.")
+        
+create_database()
