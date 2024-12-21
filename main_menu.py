@@ -88,6 +88,7 @@ def mahasiswa_menu():
         else:
             print("Pilihan tidak valid!")
 
+
 # Main program
 def main():
     while True:
@@ -95,24 +96,25 @@ def main():
         print("1. Login")
         print("2. Register")
         print("3. Keluar")
-        
+
         choice = input("Pilih menu: ").strip()
 
         if choice == '1':
-            user_role = login()
+            user_role = login()  # Panggil login function dan simpan hasil role
             if user_role == 'admin':
                 admin_menu()  # Arahkan ke menu admin setelah login admin
             elif user_role == 'mahasiswa':
                 mahasiswa_menu()  # Arahkan ke menu mahasiswa setelah login mahasiswa
             else:
-                print("Role tidak ditemukan!")
+                print("Login gagal! Tidak ada peran yang ditemukan atau login gagal.")
         elif choice == '2':
-            register_user()
+            register_user()  # Panggil fungsi untuk registrasi
         elif choice == '3':
             print("Terima kasih telah menggunakan sistem ini.")
-            break
+            break  # Keluar dari program
         else:
             print("Pilihan tidak valid!")
+
 
 # Jalankan program utama
 main()
