@@ -20,12 +20,12 @@ def login():
 
     while attempts < 3:  # Memberikan 3 kali kesempatan login
         print("\n=== Login ===")
-        email = input("Masukkan Email: ").lower()
+        nim = input("Masukkan NIM: ").lower()
         password = input("Masukkan Password: ")
         password = unicodedata.normalize("NFKC", password).strip()
 
         # Check Email
-        cursor.execute(f"SELECT password FROM users WHERE email = \"{email}\"")
+        cursor.execute(f"SELECT password FROM users WHERE nim = \"{nim}\"")
         password_result = cursor.fetchone()
 
         # Jika email tidak valid, maka password tidak ada
@@ -44,7 +44,7 @@ def login():
             
             # login berhasil jika password = hashed password
             if bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8")):
-                cursor.execute(f"SELECT user_role FROM users WHERE email = \"{email}\"")
+                cursor.execute(f"SELECT user_role FROM users WHERE nim = \"{nim}\"")
                 role = cursor.fetchone()
                 print(f"current role: {role[0]}")
                 print(f"Login berhasil sebagai {role[0]}!")
@@ -56,7 +56,7 @@ def login():
             
             # gagal jika password =/= hashed password
             else:
-                print("Login gagal! Email atau password salah.")
+                print("Login gagal! NIM atau password salah.")
                 attempts += 1  # Increment percobaan login
                 if attempts < 3:
                     print(f"Sisa percobaan login: {3 - attempts}")

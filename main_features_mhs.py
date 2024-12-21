@@ -15,11 +15,11 @@ def ajukan_kelas():
     nim = input("Masukkan NIM Anda: ").strip()
     try:
         cursor.execute('''
-        INSERT INTO pengajuan (nim, kode_kelas, tanggal_pengajuan, status_pengajuan)
-        VALUES (%s, %s, NOW(), 'Berhasil')
+        INSERT INTO transaksi (nim, kode_kelas, tanggal_transaksi, status_transaksi)
+        VALUES (%s, %s, NOW(), 'Pending')
         ''', (nim, kode_kelas))
         conn.commit()
-        print("Pengajuan kelas berhasil!")
+        print("Pengajuan kelas berhasil ditujukan kepada akademik.")
     except mysql.connector.Error as err:
         print(f"Error: {err}")
     finally:

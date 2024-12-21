@@ -16,8 +16,8 @@ def create_table():
         # Tabel users
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            username VARCHAR(255) PRIMARY KEY NOT NULL,
-            email VARCHAR(255) NOT NULL,
+            nim INT(20) PRIMARY KEY NOT NULL,
+            email VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(60) NOT NULL,
             user_role ENUM('admin','mahasiswa') NOT NULL
         )''')
@@ -80,11 +80,11 @@ def create_table():
         CREATE TABLE IF NOT EXISTS transaksi (
             id_transaksi INT AUTO_INCREMENT PRIMARY KEY,
             id_detail_kelas INT(11),
-            username VARCHAR(225) NOT NULL,
+            nim INT(20) NOT NULL,
             email VARCHAR(255) NOT NULL,
             tanggal_transaksi DATETIME NOT NULL,
             status_transaksi ENUM('Berhasil','Gagal') NOT NULL,
-            FOREIGN KEY (username) REFERENCES users(username),
+            FOREIGN KEY (nim) REFERENCES users(nim),
             FOREIGN KEY (id_detail_kelas) REFERENCES detail_kelas(id_detail_kelas)
         )''')
     
