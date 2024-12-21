@@ -75,11 +75,12 @@ def create_table():
             FOREIGN KEY (kode_kelas) REFERENCES kelas(kode_kelas)
         )''')
     
-        # Tabel transaksi
+        # Tabel transaksi tambahkan kode_kelas!!!
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS transaksi (
             id_transaksi INT AUTO_INCREMENT PRIMARY KEY,
             id_detail_kelas INT(11),
+            kode_kelas` varchar(30) NOT NULL, --untuk ajukan kelas 
             nim INT(20) NOT NULL,
             email VARCHAR(255) NOT NULL,
             tanggal_transaksi DATETIME NOT NULL,
